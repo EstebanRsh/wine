@@ -258,5 +258,12 @@ async def create_product(
         price_final=data["price_final"],
         promo_applied=data["promo"],
     )
-
+@app.get("/debug/db")
+async def debug_db(session: AsyncSession = Depends(get_session)):
+    try:
+        res = await session.execute(text("select count(*) from products"))
+        return {"db": "ok", "products_count": int(res.scalar_one())}
+    except Exception as e:
+        # solo para debug
+        return {"db": "error", "detail": str(e)}
 # Nota: Uvicorn se lanza desde el proceso del host (Render). No incluyas if __name__ == "__main__".
